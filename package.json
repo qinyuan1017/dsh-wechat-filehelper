@@ -4,6 +4,17 @@
   "description": "微信文件传输助手网页版插件：让 agent 直接把文件/文本发到自己微信，全程不用打开网页。纯 HTTP 走 webwx 协议，扫码只需一次。",
   "type": "module",
   "main": "index.js",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web"
+    },
+    "engines": {
+      "dsh": ">=0.2.1-rc.2 <0.4.0-0"
+    }
+  },
   "exports": {
     ".": "./index.js",
     "./client": "./lib/client.js",
