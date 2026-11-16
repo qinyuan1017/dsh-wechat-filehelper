@@ -1,0 +1,5 @@
+# dsh-wechat-filehelper — 微信文件传输助手网页版（filehelper.weixin.qq.com）
+# 纯 HTTP 走 webwx 协议，扫码一次后由 agent 直接发文件，不需要打开网页。
+- insert:
+    - id: wechat-filehelper
+      name: dsh-wechat-filehelper
