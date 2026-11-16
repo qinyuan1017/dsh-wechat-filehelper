@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="470" viewBox="0 0 920 470">
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#141b2b"/>
+      <stop offset="100%" stop-color="#0f1522"/>
+    </linearGradient>
+  </defs>
+  <rect width="920" height="470" fill="#0a0e17"/>
+  <rect x="24" y="20" width="872" height="430" rx="16" fill="url(#panel)" stroke="#1f2937"/>
+
+  <g font-family="ui-sans-serif, -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+    <circle cx="60" cy="64" r="6" fill="#22c55e"/>
+    <text x="80" y="60" fill="#e5e7eb" font-size="17" font-weight="600">微信文件传输助手</text>
+    <text x="80" y="82" fill="#7c8ba3" font-size="13">月咒 · 登录于 2026-11-17 00:20</text>
+
+    <rect x="720" y="44" width="96" height="34" rx="8" fill="none" stroke="#334155"/>
+    <text x="768" y="66" fill="#c7d2e0" font-size="13" text-anchor="middle">退出登录</text>
+
+    <rect x="48" y="110" width="824" height="312" rx="12" fill="#0d1320" stroke="#1f2937"/>
+    <text x="72" y="142" fill="#e5e7eb" font-size="14" font-weight="600">发送历史</text>
+    <text x="152" y="142" fill="#7c8ba3" font-size="12">共 12 条 · 成功 11 条</text>
+    <text x="804" y="142" fill="#93a5bd" font-size="12" text-anchor="middle">刷新</text>
+
+    <g>
+      <rect x="64" y="158" width="792" height="62" rx="9" fill="#111a29"/>
+      <rect x="78" y="174" width="44" height="22" rx="11" fill="#0d2f20"/>
+      <text x="100" y="189" fill="#4ade80" font-size="11" text-anchor="middle">成功</text>
+      <text x="136" y="181" fill="#e5e7eb" font-size="14">季度报表.xlsx</text>
+      <text x="136" y="200" fill="#71839c" font-size="11">2026-11-17 00:21 · 1.24 MB · 3 片 · 3651 ms</text>
+    </g>
+
+    <g>
+      <rect x="64" y="228" width="792" height="62" rx="9" fill="#111a29"/>
+      <rect x="78" y="244" width="44" height="22" rx="11" fill="#0d2f20"/>
+      <text x="100" y="259" fill="#4ade80" font-size="11" text-anchor="middle">成功</text>
+      <text x="136" y="251" fill="#e5e7eb" font-size="14">hello-from-dsh.txt</text>
+      <text x="136" y="270" fill="#71839c" font-size="11">2026-11-17 00:21 · 171 B · 719 ms</text>
+    </g>
+
+    <g>
+      <rect x="64" y="298" width="792" height="62" rx="9" fill="#111a29"/>
+      <rect x="78" y="314" width="44" height="22" rx="11" fill="#3a1f22"/>
+      <text x="100" y="329" fill="#f87171" font-size="11" text-anchor="middle">失败</text>
+      <text x="136" y="321" fill="#e5e7eb" font-size="14">安装包.apk</text>
+      <text x="136" y="340" fill="#71839c" font-size="11">文件 128.00 MB 超过上限 100.00 MB，请先压缩或分卷</text>
+    </g>
+
+    <text x="64" y="392" fill="#5b6b82" font-size="11">列表最多留 200 条；失败会写清楚原因，不用猜</text>
+  </g>
+</svg>
