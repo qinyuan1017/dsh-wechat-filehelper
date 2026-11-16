@@ -8,6 +8,8 @@
   <img alt="deps" src="https://img.shields.io/badge/dependencies-0-brightgreen">
 </p>
 
+<p align="center"><b>扫一次码，之后一句「把这个发我微信」。</b></p>
+
 ---
 
 ## 这是什么
@@ -104,22 +106,29 @@
 - **有些微信号登不上。** 微信对部分账号关掉了网页版权限，扫码后会提示不支持。这个跟插件没关系，换号或者用别的办法。
 - **登录会过期。** 一般能撑一天，失效了它会明确告诉你要重新扫，不会假装还在工作。
 
-## 踩过的四个坑
+<details>
+<summary>踩过的四个坑（点开看）</summary>
+
+### 二维码是 JPEG，不是 PNG
 
 写这东西的过程基本是「猜一版 → 被服务端打回来 → 扒官方前端源码 → 一遍过」。记下来免得别人再踩。
 
-**二维码是 JPEG，不是 PNG。**
 一开始后缀写死 `.png`，图片怎么都打不开。后来才想到按响应的 Content-Type 判断。
 
-**408 不是「过期」，是「这轮没人扫」。**
+### 408 不是「过期」，是「这轮没人扫」
+
 微信这个接口是 25 秒长轮询，到点没等到人扫码就返回 408。我一开始当成二维码作废，白白让人扫了三次。
 
-**每个请求都得带 `mmweb_appid: wx_webfilehelper`。**
+### 每个请求都得带 `mmweb_appid: wx_webfilehelper`
+
 少了这个头，登录接口直接甩一个 `Ret=1100` 参数错误，不告诉你缺哪一项。
 
-**上传的文件字段名是 `filename`，不是 `file`。**
+### 上传的文件字段名是 `filename`，不是 `file`
+
 最坑的一个。字段名写错，服务端照样返回成功，只是 `MediaId` 是空的——看着传上去了，其实文件根本没进去。
 而且 `uploadmediarequest` 的结构跟网上大多数教程写的也不一样，真正要的是 `ClientMediaId / TotalLen / StartPos / DataLen / MediaType / FromUserName / ToUserName / FileMd5`，分片信息另走 `chunks` 和 `chunk` 两个字段。
+
+</details>
 
 ## 它是怎么做到的
 
@@ -144,3 +153,5 @@ npm test
 MIT，随便改。
 
 插件目录的收录 PR 在 [awesome-dsh-plugin#16021](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/16021)。
+
+用着有问题，提 issue；要是哪天微信把接口改了，这里大概会比别处先坏，也先修。
