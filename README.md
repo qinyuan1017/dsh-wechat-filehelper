@@ -1,136 +1,209 @@
-# dsh-wechat-filehelper
+# dsh-wechat-filehelper 🐦
 
-把「微信文件传输助手」接进 DeepSeek Harness：**agent 一句话把文件发到你手机微信，全程不用打开浏览器。**
+**让你——或者你的 AI——把电脑上的文件一把甩进自己的微信。**
 
-网页版（filehelper.weixin.qq.com）在这里只当一次性的认证入口 —— 扫一次码，登录态落盘，之后全部走 HTTP 接口（`webwxinit / webwxuploadmedia / webwxsendappmsg / webwxsync / webwxgetmedia`）。
+不用打开网页版，不用天天扫码，不用点那个"上传文件"按钮。
+扫一次码，之后在 DeepSeek Harness 里说一句「把这个发我微信」，文件就躺你手机上了。
 
-仓库：https://github.com/qinyuan1017/dsh-wechat-filehelper
+---
 
-## 安装
+## 🤔 这东西到底解决什么问题
+
+想把电脑上的文件弄到手机上，以前是这么过的：
+
+- 打开微信 → 文件传输助手 → 点上传 → 选文件 → 等它转圈 → 手机上点下载 😮‍💨
+- 或者拿数据线、或者丢网盘、或者自己发自己邮件
+
+现在不用了。你在 DSH 里跟 AI 说一句就行：
+
+> 「把刚才那个报告发我微信」
+
+然后你手机微信里就多了一个文件。就这样。没有第三步。
+
+---
+
+## ✨ 它能干什么
+
+| 你说话 | 它干的活 |
+|---|---|
+| 「把这个发我微信」 | 传文件 📎 |
+| 「把 xxx.xlsx 传到我手机」 | 传文件 |
+| 「今天的数据发我一下」 | 先找最近改动的文件，再传 |
+| 「给我微信发句话」 | 发文字 💬 |
+| 「手机刚才发给我的东西收一下」 | 把文件下载到电脑 ⬇️ |
+
+而且它会**自己找文件**——你说"刚才那个"，它会去翻最近 30 分钟改过的东西，然后挑一个发，不会傻乎乎反问你"是哪个文件呀" 🙃
+
+---
+
+## 🚀 怎么用
+
+### 如果你只是用户
+
+1. 装好插件，重启 DSH（一次性）
+2. 设置页里找到「微信文件传输助手」，点「扫码登录」，掏出手机扫一下
+3. 完事。之后张嘴就行
+
+设置页里还能看到：**当前登录的是谁**、**什么时候登录的**、**发过哪些文件、成没成功**（失败会写原因，不用瞎猜）📋
+
+### 如果你是 AI（或者你在写提示词）
+
+一个工具，十来个动作：
+
+```js
+wechat_filehelper({ action: "send_file", filePath: "E:/out/report.xlsx" })
+// → 已发到微信：report.xlsx（18642 字节，1 片，1204 ms）
+
+wechat_filehelper({ action: "send_text", text: "跑完了，一共 37 条" })
+wechat_filehelper({ action: "candidates" })        // 最近改动的文件清单
+wechat_filehelper({ action: "list" })              // 手机发过来的文件
+wechat_filehelper({ action: "pull", msgId: "77" }) // 下载到本地
+wechat_filehelper({ action: "history" })           // 发送记录
+```
+
+第一次用要扫码：
+
+```js
+wechat_filehelper({ action: "login" })        // 给你一张二维码图片
+wechat_filehelper({ action: "login_check" })  // 扫完了没
+```
+
+---
+
+## 📦 装上
 
 ```bash
-# 1) 仓库已在 ~/my-repos/dsh-wechat-filehelper
-# 2) 加进 desktop profile
 cd ~/.dsh/profiles/desktop
-# package.json: dependencies 里加 "dsh-wechat-filehelper": "file:C:/Users/亭檐霜/my-repos/dsh-wechat-filehelper"
-#               dsh.profile.bundles 里加 "dsh-wechat-filehelper"
+# package.json 里加两行：
+#   dependencies:   "dsh-wechat-filehelper": "file:/path/to/dsh-wechat-filehelper"
+#   dsh.profile.bundles: 也加进去
 pnpm install
 ```
 
-插件自带 `cordis.patch.yml`，装载时自动 insert 条目 `wechat-filehelper`。
+插件自带 `cordis.patch.yml`，装上就自动挂载，不用手动改配置。
 
-## agent 怎么用
-
-一个工具 `wechat_filehelper`，按 action 分派：
-
-| action | 参数 | 作用 |
-|---|---|---|
-| `status` | — | 看是否已登录、登录时间、二维码是否待扫 |
-| `login` | — | 生成二维码（返回 `qrPath`，把图片给用户扫） |
-| `login_check` | `waitSec` | 查扫码结果，`waitSec` 最多等 120 秒；成功即落盘 |
-| `send_file` | `filePath` | **把本地文件发到微信** |
-| `send_text` | `text` | 发一段文字 |
-| `list` | `limit` | 列手机发来的文件（含 `msgId`） |
-| `pull` | `msgId` / `mediaId` / `destDir` | 把文件下载到本地 |
-| `logout` | — | 清除本地登录态 |
-
-典型对话：
-
-```
-用户：把这个报表发我微信
-agent → wechat_filehelper({ action: "send_file", filePath: "E:/out/report.xlsx" })
-        → 已发到微信：report.xlsx（18 字节，1 片，1204 ms）
-```
-
-首次需要扫码：
-
-```
-agent → wechat_filehelper({ action: "login" })        // 返回 qrPath，把图展示给用户
-用户：扫好了
-agent → wechat_filehelper({ action: "login_check", waitSec: 30 })
-        → 登录成功：月咒
-```
-
-## 数据与登录态
-
-- 目录：`~/.dsh/data/dsh-wechat-filehelper/`（可用 `DSH_WECHAT_FH_DIR` 覆盖）
-  - `session.json` —— cookie + skey/wxsid/wxuin/pass_ticket/deviceId/UserName（权限 600）
-  - `pending.json` —— 待扫码 uuid（5 分钟过期）
-  - `qr.png` —— 最近一次二维码
-  - `recent.json` —— 最近收到的文件索引
-  - `downloads/` —— `pull` 默认落盘目录
-- `deviceId` 固定复用，不每次重生成（微信风控）。
-
-## 协议要点（为什么要这么做）
-
-| 环节 | 接口 | 关键参数 |
-|---|---|---|
-| 取 uuid | `login.weixin.qq.com/jslogin` | `appid=wx_webfilehelper` |
-| 二维码 | `login.weixin.qq.com/qrcode/{uuid}` | 图片直出，`uuid` 原样拼（含 `==`） |
-| 轮询 | `login.weixin.qq.com/cgi-bin/mmwebwx-bin/login` | `loginicon=true&uuid=…`，code 200/201/408 |
-| 换票 | `webwxnewloginpage?fun=new&version=v2` | 返回 XML，Set-Cookie 带 `webwx_data_ticket` |
-| 初始化 | `webwxinit` | 拿自己的 `UserName` 和 `SyncKey` |
-| 上传 | `webwxuploadmedia?f=json` | 512KB 分片，`uploadmediarequest` 带 TotalChunks/Chunk/FileSize |
-| 发送 | `webwxsendappmsg` | `Type=6`，Content 是 appmsg XML，`attachid=MediaId` |
-| 收件 | `webwxsync` | `AddMsgList` 里 `MsgType=49` + `AppMsg.Type=6` |
-| 下载 | `webwxgetmedia` | `mediaid & sender & filename`，会 302 到 CDN |
-
-## 限制
-
-- 单文件上限 **100MB**（`MAX_FILE_BYTES`），超限直接报错不硬发。
-- 上传分片串行、每片间隔 1.2s：这是给微信频控留的余量，并发会触发「操作过于频繁」。
-- 目标固定为「文件传输助手」（即用户自己）；w x.qq.com 那套给别人的通道早已停服。
-- 部分账号不支持网页版登录（扫码后 code=400/500），这时只能换号。
-- 登录态会过期；`send_*` 报 1101/1102 时重新 `login`。
-
-## 设置页
-
-DSH 设置页里有一块「微信文件传输助手」分区（`settings.section`，order 32）：
-
-- **登录状态**：绿点/灰点、昵称、登录时间；未登录时可直接点「扫码登录」
-- **二维码**：点一下就在面板里出图，2 秒轮询一次，扫完自动切到已登录
-- **发送历史**：时间 / 文件名 / 大小 / 分片数 / 耗时 / 成功失败，失败带原因，最多留 200 条
-
-界面走 `lib/client.js`（`src/*.js` 拼接产物），数据走 `POST /wechat-filehelper/api`：
-`state / qr / qr_check / history / send_file / candidates / logout`。
-
-## 让 agent 主动发送
-
-插件会往系统提示里注入一段规则（`systemPrompt.section`），用户说
-「发我微信」「发到文件传输助手」「传到我手机」时，agent 直接调 `wechat_filehelper`，
-不反问、不只回一句“好的”。
-
-不知道文件是哪个的时候，工具会返回最近 30 分钟改动过的文件候选清单
-（`action=candidates`），让模型自己挑，而不是回头问用户。
-
-## 测试
+不想装宿主也能用命令行顶着：
 
 ```bash
-node test/protocol.test.mjs   # 17 项：协议层，纯 mock，不联网
-node test/plugin.test.mjs     # 14 项：apply() 注册 → 提示词 → 登录状态机 → 发文件/文本/收件
-node test/rpc.test.mjs        # 10 项：设置页接口（含回环鉴权、未知 op、历史倒序）
-node test/client.test.mjs     #  5 项：客户端 bundle 在假 loader 下执行并注册 settings.section
+node scripts/fh.mjs qr       # 出二维码
+node scripts/fh.mjs wait     # 等扫码
+node scripts/fh.mjs status   # 登录状态
+node scripts/fh.mjs send 文件路径
+node scripts/fh.mjs text "要说的话"
 ```
 
-合计 46 项。
+---
 
-协议层覆盖：cookie jar、appmsg XML 转义、官方格式的 uploadmediarequest、512KB 分片与
-chunks/chunk 字段、空文件/超限拒绝、sync 消息解析、getmedia 下载、init Ret=1101 失效路径。
+## 🧠 它是怎么做到的
 
-## 真机验证记录（2026-11-16）
+微信有个「文件传输助手网页版」（filehelper.weixin.qq.com）。
+这个插件**只把那个网页当一次性的登录入口**——你扫码登录，它把登录凭证存下来，然后所有操作都走纯 HTTP：
 
-| 项 | 结果 |
+```
+扫码 → 换票 → 初始化 → 512KB 分片上传 → 发一条 appmsg 消息 → 完事
+```
+
+全程不打开浏览器，不跑无头 Chrome，不模拟点击。就是普通的 HTTP 请求，快的时候 700ms 一个文件 ⚡
+
+| 环节 | 接口 | 一句话 |
+|---|---|---|
+| 拿二维码 | `jslogin` | appid 是 `wx_webfilehelper` |
+| 等你扫 | `login` | 25 秒一轮长轮询 |
+| 换登录凭证 | `webwxnewloginpage` | 返回 XML，cookie 里带票据 |
+| 认人 | `webwxinit` | 拿到自己的 UserName 和同步钥匙 |
+| 传文件 | `webwxuploadmedia` | 512KB 一片，串行传 |
+| 发出去 | `webwxsendappmsg` | 一条带附件的消息 |
+| 收文件 | `webwxsync` + `webwxgetmedia` | 轮询 + 下载 |
+
+---
+
+## ⚠️ 几个你可能会踩的坑（我替你踩过了）
+
+**1. 单个文件最大 100MB。** 硬上限，超了直接报错，不会传一半挂那儿。
+
+**2. 大文件慢。** 每片之间留了 1.2 秒。这是给微信的风控留的呼吸空间——传太快会被判定"操作过于频繁"。宁可慢也别封号 ⏳
+
+**3. 有些微信号登不上网页版。** 微信对部分账号关了这个口子，扫码后会提示不支持。这不是插件的问题，换号吧 🙏
+
+**4. 登录态会过期。** 一般能撑一天。失效了工具会明确告诉你重新扫码，不会静默失败。
+
+**5. 只能发给自己。** 目标固定是「文件传输助手」，就是你自己。不是群发工具。
+
+---
+
+## 🔬 开发笔记：四个把我干趴下的坑
+
+写这个插件的过程基本是"猜 → 被打回 → 扒官方源码 → 秒过"。
+
+**① 二维码不是 PNG，是 JPEG。**
+文件后缀写死 `.png`，图片打不开。改成按 `Content-Type` 判断才对。
+
+**② 408 不是"过期"，是"这轮没人扫"。**
+微信这个接口是 25 秒长轮询，超时返回 `code=408`，意思是"再等等"，不是码废了。我一开始当过期处理，白让人扫了三次 😅
+
+**③ 每个请求都要带 `mmweb_appid: wx_webfilehelper`。**
+少了这个头，登录接口直接甩你一个 `Ret=1100`（参数错误），不告诉你缺什么。
+
+**④ 上传的文件字段名是 `filename`，不是 `file`。**
+这个最坑。字段名错了服务端也返回成功，但 `MediaId` 是空的——看起来传上去了，其实文件根本没进去。
+而且 `uploadmediarequest` 里的结构跟网上大多数教程写的不一样：
+
+```diff
+- { TotalChunks, Chunk, FileSize, Filename }   ❌ 照这个写永远拿不到 MediaId
++ { ClientMediaId, TotalLen, StartPos, DataLen, MediaType,
++   FromUserName, ToUserName, FileMd5 }          ✅ 官方真正要的
+```
+
+分片信息走独立的 `chunks` / `chunk` 两个字段，别塞进 JSON 里。
+
+---
+
+## 🧪 测试
+
+```bash
+node test/protocol.test.mjs   # 17 项 · 协议层，纯 mock 不联网
+node test/plugin.test.mjs     # 14 项 · 完整链路：注册 → 提示词 → 登录 → 发文件 → 收件
+node test/rpc.test.mjs        # 10 项 · 设置页接口（含鉴权、未知 op、历史倒序）
+node test/client.test.mjs     #  5 项 · 客户端 bundle 在假 loader 下跑起来并注册成功
+```
+
+**46 项，全绿。** 而且全部离线跑——不需要你有微信账号，不需要网络。
+
+真机也验过了：
+
+| 场景 | 结果 |
 |---|---|
-| 扫码登录 | 成功，会话域 `szfilehelper.weixin.qq.com`，昵称「6」 |
-| 发 171B 文本文件 | sent，msgId 返回，719 ms |
-| 发 1.2MB 文件（3 片） | sent，3.65 s |
-| 发文本消息 | sent |
+| 扫码登录 | ✅ 成功（会话域 `szfilehelper.weixin.qq.com`） |
+| 发 171 字节文本 | ✅ 719 ms |
+| 发 1.2MB 文件 | ✅ 3.65 s，分 3 片 |
+| 发纯文字 | ✅ 成功 |
 
-踩过的四个坑（都写进了代码注释）：
+---
 
-1. 二维码是 **JPEG** 不是 PNG —— 按 `Content-Type` 定扩展名。
-2. 扫码轮询的 `code=408` 是「本轮 25s 没人扫」，不是二维码过期。
-3. 所有请求必须带 `mmweb_appid: wx_webfilehelper`，否则 `webwxinit` 直接 1100。
-4. 上传的文件本体字段名是 **`filename`**（不是 `file`），且 `uploadmediarequest` 里是
-   `ClientMediaId/TotalLen/DataLen/MediaType/FromUserName/ToUserName/FileMd5`，
-   分片信息走独立的 `chunks`/`chunk` —— 写成 `FileSize/Filename` 会得到 `Ret=1` 或空 MediaId。
+## 🗂 项目结构
+
+```
+dsh-wechat-filehelper/
+├── index.js              # 插件入口：工具 + 系统提示 + 路由
+├── lib/
+│   ├── webwx.js          # 协议客户端，所有接口都在这
+│   ├── filehelper.js     # 业务：登录状态机 / 发文件 / 收件
+│   ├── session.js        # 登录态落盘
+│   ├── history.js        # 发送历史
+│   └── client.js         # 设置页 UI（src/ 拼出来的）
+├── src/                  # 设置页源码（三个片段）
+├── scripts/fh.mjs        # 命令行版本
+└── test/                 # 46 项测试
+```
+
+---
+
+## 📄 License
+
+MIT。拿去改，改完记得给个 star ⭐
+
+---
+
+<p align="center">
+  <sub>为 DeepSeek Harness 写的。为"懒得开网页"写的。</sub>
+</p>
