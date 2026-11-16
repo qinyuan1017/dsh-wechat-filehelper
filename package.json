@@ -29,7 +29,8 @@
     "README.md"
   ],
   "scripts": {
-    "test": "node test/protocol.test.mjs"
+    "test": "node test/protocol.test.mjs && node test/plugin.test.mjs && node test/rpc.test.mjs && node test/client.test.mjs",
+    "prepublishOnly": "npm test"
   },
   "keywords": [
     "dsh",
@@ -41,6 +42,18 @@
     "file-transfer"
   ],
   "license": "MIT",
+  "author": "qinyuan1017",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qinyuan1017/dsh-wechat-filehelper.git"
+  },
+  "homepage": "https://github.com/qinyuan1017/dsh-wechat-filehelper#readme",
+  "bugs": {
+    "url": "https://github.com/qinyuan1017/dsh-wechat-filehelper/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=20"
   }
