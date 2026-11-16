@@ -3,6 +3,10 @@
 </p>
 
 <p align="center">
+  <b>中文</b> · <a href="README.en.md">English</a>
+</p>
+
+<p align="center">
   <a href="#测试"><img alt="tests" src="https://img.shields.io/badge/tests-46-brightgreen"></a>
   <img alt="license" src="https://img.shields.io/badge/license-MIT-blue">
   <img alt="deps" src="https://img.shields.io/badge/dependencies-0-brightgreen">
@@ -136,7 +140,7 @@
 
 微信有个「文件传输助手网页版」。这个插件只把那个网页当一次性的登录入口——你扫码，它把凭证存下来，之后所有操作都走普通 HTTP：
 
-扫码 → 换票 → 初始化 → 512KB 分片上传 → 发一条带附件的消息。
+扫码 → 拿到登录凭证 → 初始化会话 → 512KB 分片上传 → 发一条带附件的消息。
 
 没有浏览器，没有无头 Chrome，不模拟点击。快的时候一个文件 700 毫秒。
 
