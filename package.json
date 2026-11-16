@@ -1,6 +1,6 @@
 {
   "name": "dsh-wechat-filehelper",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "微信文件传输助手网页版插件：让 agent 直接把文件/文本发到自己微信，全程不用打开网页。纯 HTTP 走 webwx 协议，扫码只需一次。",
   "type": "module",
   "main": "index.js",

@@ -4,6 +4,8 @@
 
 网页版（filehelper.weixin.qq.com）在这里只当一次性的认证入口 —— 扫一次码，登录态落盘，之后全部走 HTTP 接口（`webwxinit / webwxuploadmedia / webwxsendappmsg / webwxsync / webwxgetmedia`）。
 
+仓库：https://github.com/qinyuan1017/dsh-wechat-filehelper
+
 ## 安装
 
 ```bash
@@ -81,12 +83,36 @@ agent → wechat_filehelper({ action: "login_check", waitSec: 30 })
 - 部分账号不支持网页版登录（扫码后 code=400/500），这时只能换号。
 - 登录态会过期；`send_*` 报 1101/1102 时重新 `login`。
 
+## 设置页
+
+DSH 设置页里有一块「微信文件传输助手」分区（`settings.section`，order 32）：
+
+- **登录状态**：绿点/灰点、昵称、登录时间；未登录时可直接点「扫码登录」
+- **二维码**：点一下就在面板里出图，2 秒轮询一次，扫完自动切到已登录
+- **发送历史**：时间 / 文件名 / 大小 / 分片数 / 耗时 / 成功失败，失败带原因，最多留 200 条
+
+界面走 `lib/client.js`（`src/*.js` 拼接产物），数据走 `POST /wechat-filehelper/api`：
+`state / qr / qr_check / history / send_file / candidates / logout`。
+
+## 让 agent 主动发送
+
+插件会往系统提示里注入一段规则（`systemPrompt.section`），用户说
+「发我微信」「发到文件传输助手」「传到我手机」时，agent 直接调 `wechat_filehelper`，
+不反问、不只回一句“好的”。
+
+不知道文件是哪个的时候，工具会返回最近 30 分钟改动过的文件候选清单
+（`action=candidates`），让模型自己挑，而不是回头问用户。
+
 ## 测试
 
 ```bash
 node test/protocol.test.mjs   # 17 项：协议层，纯 mock，不联网
-node test/plugin.test.mjs     # 12 项：走 apply() 注册 → 登录状态机 → 发文件/文本/收件/下载
+node test/plugin.test.mjs     # 14 项：apply() 注册 → 提示词 → 登录状态机 → 发文件/文本/收件
+node test/rpc.test.mjs        # 10 项：设置页接口（含回环鉴权、未知 op、历史倒序）
+node test/client.test.mjs     #  5 项：客户端 bundle 在假 loader 下执行并注册 settings.section
 ```
+
+合计 46 项。
 
 协议层覆盖：cookie jar、appmsg XML 转义、官方格式的 uploadmediarequest、512KB 分片与
 chunks/chunk 字段、空文件/超限拒绝、sync 消息解析、getmedia 下载、init Ret=1101 失效路径。
