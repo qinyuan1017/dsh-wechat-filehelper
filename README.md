@@ -1,11 +1,23 @@
-# dsh-wechat-filehelper 🐦
+<p align="center">
+  <img src="assets/banner.svg" alt="dsh-wechat-filehelper" width="100%">
+</p>
 
-**让你——或者你的 AI——把电脑上的文件一把甩进自己的微信。**
+<p align="center">
+  <a href="#-测试"><img alt="tests" src="https://img.shields.io/badge/tests-46%20passing-brightgreen"></a>
+  <img alt="license" src="https://img.shields.io/badge/license-MIT-blue">
+  <img alt="dsh" src="https://img.shields.io/badge/dsh-%E2%89%A50.2.1-6b7d96">
+  <img alt="node" src="https://img.shields.io/badge/node-%E2%89%A520-339933">
+  <img alt="deps" src="https://img.shields.io/badge/dependencies-0-brightgreen">
+</p>
 
-不用打开网页版，不用天天扫码，不用点那个"上传文件"按钮。
-扫一次码，之后在 DeepSeek Harness 里说一句「把这个发我微信」，文件就躺你手机上了。
+<h3 align="center">把电脑上的文件，一把甩进自己的微信。</h3>
+
+<p align="center">
+  扫一次码 · 之后一句「发我微信」就够 · 纯 HTTP，不开浏览器
+</p>
 
 ---
+
 
 ## 🤔 这东西到底解决什么问题
 
@@ -95,6 +107,11 @@ node scripts/fh.mjs text "要说的话"
 ---
 
 ## 🧠 它是怎么做到的
+
+<p align="center">
+  <img src="assets/flow.svg" alt="一句话 → agent → 分片上传 → 你的微信" width="100%">
+</p>
+
 
 微信有个「文件传输助手网页版」（filehelper.weixin.qq.com）。
 这个插件**只把那个网页当一次性的登录入口**——你扫码登录，它把登录凭证存下来，然后所有操作都走纯 HTTP：
